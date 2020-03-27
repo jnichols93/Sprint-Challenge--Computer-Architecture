@@ -22,7 +22,7 @@ SP = 7
 less_flag = 0b00000100
 greater_flag = 0b00000010
 equal_flag = 0b00000001
-end_flag = 0b01001001
+
 
 class CPU:
     """Main CPU class."""
@@ -88,10 +88,13 @@ class CPU:
         elif op == "MUL":
             self.register[reg_a] *= self.register[reg_b]
         elif op == "CMP":
+            #if register of reg_a is less than that of reg_b, set flag to the less_flag
             if self.register[reg_a] < self.register[reg_b]:
                 self.fl = less_flag
+            # if greater, set to greater flag
             elif self.register[reg_a] > self.register[reg_b]:
                 self.fl = greater_flag
+            # otherwise, set to equal flag
             else:
                 self.fl = equal_flag
         else:
@@ -168,21 +171,30 @@ class CPU:
         self.register[SP] += 1
 
     def handle_cmp(self, operand_a, operand_b):
+        #run the CMP alu command
         self.alu('CMP', operand_a, operand_b)
+        #increment self.pc
         self.pc += 3
 
     def handle_jmp(self, operand_a, operand_b):
+        #set pc to the register of operand_a for the jump
         self.pc = self.register[operand_a]
 
     def handle_jeq(self, operand_a, operand_b):
+        #if the flag is the equal flag
         if self.fl & equal_flag:
+            #set pc to the register for operand_a
             self.pc = self.register[operand_a]
+            #otherwise increment self.pc
         else:
             self.pc += 2
 
     def handle_jne(self, operand_a, operand_b):
+        # if no self.fl and equal flag after cmp
         if not self.fl & equal_flag:
+            #set pc to the register for operand_a
             self.pc = self.register[operand_a]
+            #otherwise increment self.pc
         else:
             self.pc += 2
 
